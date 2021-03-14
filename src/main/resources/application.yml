@@ -54,8 +54,12 @@ UserController:
   all-roles: Returns all roles in the system
 
 
-CountiesController:
-  all-counties: Returns all registered counties in the system
+AccountsController:
+  balance: Returns the current account balance
+  create: Creates a new bank account for the currently logged in user
+  credit: Credits an account with a specified amount
+  debit: Debits a specified amount from a specified account
+  transfer: Transfers a specified amount from one specified account to another
 
 
 org:

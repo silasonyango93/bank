@@ -54,9 +54,9 @@ public class UserController {
     @PostMapping("/signin")
     @ApiOperation(value = "${UserController.signin}", response = AuthenticationObject.class)
     @ApiResponses(value = {//
-            @ApiResponse(code = 400, message = "Bad request"), //
-            @ApiResponse(code = 422, message = "A user does not exist by this email"), //
-            @ApiResponse(code = 200, message = "Succesful authentication"), //
+            @ApiResponse(code = 400, message = "Bad request"),
+            @ApiResponse(code = 422, message = "A user does not exist by this email"),
+            @ApiResponse(code = 200, message = "Succesful authentication"),
             @ApiResponse(code = 401, message = "Invalid username/password supplied")})
     public ResponseEntity<AuthenticationObject> login(@ApiParam("Login User") @RequestBody UserLoginDTO userLoginDTO) {
         AuthenticationObject authenticationObject = userService.signin(userLoginDTO.getEmail(), userLoginDTO.getPassword());
@@ -73,8 +73,8 @@ public class UserController {
 
     @PostMapping("/signup")
     @ApiOperation(value = "${UserController.signup}", response = SignupStatusDto.class)
-    @ApiResponses(value = {//
-            @ApiResponse(code = 400, message = "Bad request"), //
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "Bad request"),
             @ApiResponse(code = 422, message = "Email is already in use")})
     public ResponseEntity<SignupStatusDto> signup(@ApiParam("Signup User") @RequestBody UserDataDTO user) {
         SignupStatusDto signupStatusDto = userService.signup(new User(
@@ -144,31 +144,7 @@ public class UserController {
         return rolesRepository.findAll();
     }
 
-//    @GetMapping(value = "/{username}")
-//    //@PreAuthorize("hasRole('ROLE_ADMIN')")
-//    @ApiOperation(value = "${UserController.search}", response = UserResponseDTO.class, authorizations = {@Authorization(value = "apiKey")})
-//    @ApiResponses(value = {//
-//            @ApiResponse(code = 400, message = "Something went wrong"), //
-//            @ApiResponse(code = 403, message = "Access denied"), //
-//            @ApiResponse(code = 404, message = "The user doesn't exist"), //
-//            @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
-//    public UserResponseDTO search(@ApiParam("Username") @PathVariable String username) {
-//        return modelMapper.map(userService.search(username), UserResponseDTO.class);
-//    }
-//
-//    @GetMapping(value = "/me")
-//    @ApiOperation(value = "${UserController.me}", response = UserResponseDTO.class, authorizations = {@Authorization(value = "apiKey")})
-//    @ApiResponses(value = {//
-//            @ApiResponse(code = 400, message = "Something went wrong"), //
-//            @ApiResponse(code = 403, message = "Access denied"), //
-//            @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
-//    public boolean whoami(HttpServletRequest req) {
-//        //return modelMapper.map(userService.whoami(req), UserResponseDTO.class);
-//        return true;
-//    }
-
     @GetMapping("/refresh")
-    //@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_CLIENT')")
     public String refresh(HttpServletRequest req) {
         return userService.refresh(req.getRemoteUser());
     }
