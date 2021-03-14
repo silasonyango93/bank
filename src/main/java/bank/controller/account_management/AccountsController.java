@@ -4,15 +4,33 @@ import bank.dto.account_management.AccountBalanceResponseDto;
 import bank.dto.account_management.AccountCreationRequestDto;
 import bank.dto.account_management.AccountCreditRequestDto;
 import bank.dto.account_management.TransferRequestDto;
+import bank.dto.user_management.AuthenticationObject;
 import bank.entity.account_management.AccountsEntity;
+import bank.entity.user_management.User;
+import bank.repository.account_management.AccountsRepository;
+import bank.repository.user_management.UserRepository;
+import bank.security.JwtTokenProvider;
+import bank.service.account_management.AccountService;
 import io.swagger.annotations.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/account")
 @Api(tags = "accounts")
 public class AccountsController {
+    @Autowired
+    JwtTokenProvider jwtTokenProvider;
 
+    @Autowired
+    UserRepository userRepository;
+
+    @Autowired
+    AccountService accountService;
 
     @GetMapping(value = "/balance/{accountNumber}")
     @ApiOperation(value = "${AccountsController.balance}", response = AccountBalanceResponseDto.class, authorizations = {@Authorization(value = "apiKey")})
@@ -31,8 +49,16 @@ public class AccountsController {
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Bad request"),
             @ApiResponse(code = 422, message = "Account number already exists")})
-    public void createAccount(@ApiParam("Account details") @RequestBody AccountCreationRequestDto accountCreationRequestDto) {
+    public ResponseEntity<AccountsEntity> createAccount(HttpServletRequest httpServletRequest, @ApiParam("Account details") @RequestBody AccountCreationRequestDto accountCreationRequestDto) {
+        String accessToken = jwtTokenProvider.resolveToken(httpServletRequest);
+        String email = jwtTokenProvider.getUsername(accessToken);
+        User currentUser = userRepository.findByUserEmail(email);
 
+        AccountsEntity createdAccount = accountService.createAccount(currentUser.getUserId(),accountCreationRequestDto);
+        if (createdAccount == null) {
+            return new ResponseEntity<AccountsEntity>(createdAccount, HttpStatus.valueOf(500));
+        }
+        return new ResponseEntity<AccountsEntity>(createdAccount, HttpStatus.valueOf(200));
     }
 
     @PostMapping("/credit")

@@ -3,7 +3,7 @@ package bank.entity.account_management;
 import javax.persistence.*;
 
 @javax.persistence.Entity
-@Table(name = "account_management")
+@Table(name = "accounts")
 public class AccountsEntity implements java.io.Serializable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,6 +24,17 @@ public class AccountsEntity implements java.io.Serializable{
 
     @Column(name = "IsTransactionOnGoing")
     private int isTransactionOnGoing;
+
+    public AccountsEntity() {
+    }
+
+    public AccountsEntity(int userId, String accountName, String accountNumber, double accountBalance, int isTransactionOnGoing) {
+        this.userId = userId;
+        this.accountName = accountName;
+        this.accountNumber = accountNumber;
+        this.accountBalance = accountBalance;
+        this.isTransactionOnGoing = isTransactionOnGoing;
+    }
 
     public int getAccountId() {
         return accountId;
