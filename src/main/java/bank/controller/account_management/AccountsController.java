@@ -2,7 +2,7 @@ package bank.controller.account_management;
 
 import bank.dto.account_management.AccountStatusResponseDto;
 import bank.dto.account_management.AccountCreationRequestDto;
-import bank.dto.account_management.AccountCreditRequestDto;
+import bank.dto.account_management.AccountCreditOrDebitRequestDto;
 import bank.dto.account_management.TransferRequestDto;
 import bank.entity.account_management.AccountStatus;
 import bank.entity.account_management.AccountsEntity;
@@ -53,7 +53,7 @@ public class AccountsController {
         String email = jwtTokenProvider.getUsername(accessToken);
         User currentUser = userRepository.findByUserEmail(email);
 
-        AccountsEntity createdAccount = accountService.createAccount(currentUser.getUserId(),accountCreationRequestDto);
+        AccountsEntity createdAccount = accountService.createAccount(currentUser.getUserId(), accountCreationRequestDto);
         if (createdAccount == null) {
             return new ResponseEntity<AccountsEntity>(createdAccount, HttpStatus.valueOf(500));
         }
@@ -67,8 +67,8 @@ public class AccountsController {
             @ApiResponse(code = 422, message = "Account number does not exist"),
             @ApiResponse(code = 425, message = "Ongoing transaction")
     })
-    public ResponseEntity<AccountStatusResponseDto> creditAccount(@ApiParam("Account details") @RequestBody AccountCreditRequestDto accountCreditRequestDto) {
-        AccountStatusResponseDto accountStatusResponseDto = accountService.creditAnAccount(accountCreditRequestDto.getAccountNumber(),accountCreditRequestDto.getAmount());
+    public ResponseEntity<AccountStatusResponseDto> creditAccount(@ApiParam("Account details") @RequestBody AccountCreditOrDebitRequestDto accountCreditOrDebitRequestDto) {
+        AccountStatusResponseDto accountStatusResponseDto = accountService.creditAnAccount(accountCreditOrDebitRequestDto.getAccountNumber(), accountCreditOrDebitRequestDto.getAmount());
         if (accountStatusResponseDto.getAccountStatus() == AccountStatus.ONGOING_TRANSACTION) {
             return new ResponseEntity<AccountStatusResponseDto>(accountStatusResponseDto, HttpStatus.valueOf(425));
         }
@@ -87,8 +87,22 @@ public class AccountsController {
             @ApiResponse(code = 422, message = "Account number does not exist"),
             @ApiResponse(code = 423, message = "Insufficient funds")
     })
-    public void debitAccount(@ApiParam("Account details") @RequestBody AccountCreditRequestDto accountCreditRequestDto) {
+    public ResponseEntity<AccountStatusResponseDto> debitAccount(@ApiParam("Account details") @RequestBody AccountCreditOrDebitRequestDto accountCreditOrDebitRequestDto) {
+        AccountStatusResponseDto accountStatusResponseDto = accountService.debitAnAccount(accountCreditOrDebitRequestDto.getAccountNumber(), accountCreditOrDebitRequestDto.getAmount());
 
+        if (accountStatusResponseDto.getAccountStatus() == AccountStatus.ONGOING_TRANSACTION) {
+            return new ResponseEntity<AccountStatusResponseDto>(accountStatusResponseDto, HttpStatus.valueOf(425));
+        }
+
+        if (accountStatusResponseDto.getAccountStatus() == AccountStatus.DOES_NOT_EXIST) {
+            return new ResponseEntity<AccountStatusResponseDto>(accountStatusResponseDto, HttpStatus.valueOf(422));
+        }
+
+        if (accountStatusResponseDto.getAccountStatus() == AccountStatus.INSUFFICIENT_FUNDS) {
+            return new ResponseEntity<AccountStatusResponseDto>(accountStatusResponseDto, HttpStatus.valueOf(423));
+        }
+
+        return new ResponseEntity<AccountStatusResponseDto>(accountStatusResponseDto, HttpStatus.valueOf(200));
     }
 
     @PostMapping("/transfer")

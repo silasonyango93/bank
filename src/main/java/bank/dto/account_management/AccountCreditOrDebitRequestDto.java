@@ -1,6 +1,6 @@
 package bank.dto.account_management;
 
-public class AccountCreditRequestDto {
+public class AccountCreditOrDebitRequestDto {
     private String accountNumber;
     private double amount;
 

@@ -77,4 +77,65 @@ public class AccountService {
                 AccountStatus.SUCCESSFUL_TRANSACTION
         );
     }
+
+
+
+
+    public AccountStatusResponseDto debitAnAccount(String accountNumber, double amount) {
+        AccountsEntity accountToBeDebited = accountsRepository.findByAccountNumber(accountNumber);
+
+        if (accountToBeDebited == null) {
+            return new AccountStatusResponseDto(
+                    0,
+                    null,
+                    0.0,
+                    false,
+                    AccountStatus.DOES_NOT_EXIST
+            );
+        }
+
+        if (accountToBeDebited.getIsTransactionOnGoing() == 1) {
+            return new AccountStatusResponseDto(
+                    accountToBeDebited.getAccountId(),
+                    accountToBeDebited.getAccountName(),
+                    accountToBeDebited.getAccountBalance(),
+                    true,
+                    AccountStatus.ONGOING_TRANSACTION
+            );
+        }
+
+        if (accountToBeDebited.getAccountBalance() < amount) {
+            return new AccountStatusResponseDto(
+                    accountToBeDebited.getAccountId(),
+                    accountToBeDebited.getAccountName(),
+                    accountToBeDebited.getAccountBalance(),
+                    false,
+                    AccountStatus.INSUFFICIENT_FUNDS
+            );
+        }
+
+        accountToBeDebited.setIsTransactionOnGoing(1);
+        accountsRepository.save(accountToBeDebited);
+        AccountsEntity lockedAccount = accountsRepository.findByAccountNumber(accountNumber);
+
+        lockedAccount.setAccountBalance(lockedAccount.getAccountBalance() - amount);
+        lockedAccount.setIsTransactionOnGoing(0);
+        AccountsEntity updatedAccount = accountsRepository.save(lockedAccount);
+
+        transactionsRepository.save(new TransactionsEntity(
+                transactionTypesRepository.findByTransactionTypeCode(2).getTransactionTypeId(),
+                updatedAccount.getAccountId(),
+                accountToBeDebited.getAccountBalance(),
+                updatedAccount.getAccountBalance(),
+                null,
+                updatedAccount.getAccountNumber()
+        ));
+        return new AccountStatusResponseDto(
+                updatedAccount.getAccountId(),
+                updatedAccount.getAccountName(),
+                updatedAccount.getAccountBalance(),
+                false,
+                AccountStatus.SUCCESSFUL_TRANSACTION
+        );
+    }
 }
