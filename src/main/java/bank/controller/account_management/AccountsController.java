@@ -1,13 +1,12 @@
 package bank.controller.account_management;
 
-import bank.dto.account_management.AccountBalanceResponseDto;
+import bank.dto.account_management.AccountStatusResponseDto;
 import bank.dto.account_management.AccountCreationRequestDto;
 import bank.dto.account_management.AccountCreditRequestDto;
 import bank.dto.account_management.TransferRequestDto;
-import bank.dto.user_management.AuthenticationObject;
+import bank.entity.account_management.AccountStatus;
 import bank.entity.account_management.AccountsEntity;
 import bank.entity.user_management.User;
-import bank.repository.account_management.AccountsRepository;
 import bank.repository.user_management.UserRepository;
 import bank.security.JwtTokenProvider;
 import bank.service.account_management.AccountService;
@@ -33,7 +32,7 @@ public class AccountsController {
     AccountService accountService;
 
     @GetMapping(value = "/balance/{accountNumber}")
-    @ApiOperation(value = "${AccountsController.balance}", response = AccountBalanceResponseDto.class, authorizations = {@Authorization(value = "apiKey")})
+    @ApiOperation(value = "${AccountsController.balance}", response = AccountStatusResponseDto.class, authorizations = {@Authorization(value = "apiKey")})
     @ApiResponses(value = {//
             @ApiResponse(code = 400, message = "Something went wrong"),
             @ApiResponse(code = 403, message = "Access denied"),
@@ -62,16 +61,27 @@ public class AccountsController {
     }
 
     @PostMapping("/credit")
-    @ApiOperation(value = "${AccountsController.credit}", response = AccountBalanceResponseDto.class)
+    @ApiOperation(value = "${AccountsController.credit}", response = AccountStatusResponseDto.class)
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Bad request"),
-            @ApiResponse(code = 422, message = "Account number does not exist")})
-    public void creditAccount(@ApiParam("Account details") @RequestBody AccountCreditRequestDto accountCreditRequestDto) {
+            @ApiResponse(code = 422, message = "Account number does not exist"),
+            @ApiResponse(code = 425, message = "Ongoing transaction")
+    })
+    public ResponseEntity<AccountStatusResponseDto> creditAccount(@ApiParam("Account details") @RequestBody AccountCreditRequestDto accountCreditRequestDto) {
+        AccountStatusResponseDto accountStatusResponseDto = accountService.creditAnAccount(accountCreditRequestDto.getAccountNumber(),accountCreditRequestDto.getAmount());
+        if (accountStatusResponseDto.getAccountStatus() == AccountStatus.ONGOING_TRANSACTION) {
+            return new ResponseEntity<AccountStatusResponseDto>(accountStatusResponseDto, HttpStatus.valueOf(425));
+        }
 
+        if (accountStatusResponseDto.getAccountStatus() == AccountStatus.DOES_NOT_EXIST) {
+            return new ResponseEntity<AccountStatusResponseDto>(accountStatusResponseDto, HttpStatus.valueOf(422));
+        }
+
+        return new ResponseEntity<AccountStatusResponseDto>(accountStatusResponseDto, HttpStatus.valueOf(200));
     }
 
     @PostMapping("/debit")
-    @ApiOperation(value = "${AccountsController.debit}", response = AccountBalanceResponseDto.class)
+    @ApiOperation(value = "${AccountsController.debit}", response = AccountStatusResponseDto.class)
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Bad request"),
             @ApiResponse(code = 422, message = "Account number does not exist"),
@@ -82,7 +92,7 @@ public class AccountsController {
     }
 
     @PostMapping("/transfer")
-    @ApiOperation(value = "${AccountsController.transfer}", response = AccountBalanceResponseDto.class)
+    @ApiOperation(value = "${AccountsController.transfer}", response = AccountStatusResponseDto.class)
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Bad request"),
             @ApiResponse(code = 420, message = "Account to be debited does not exist"),

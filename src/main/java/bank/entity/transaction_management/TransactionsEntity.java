@@ -22,6 +22,25 @@ public class TransactionsEntity implements java.io.Serializable{
     @Column(name = "AccBalanceAfterTransaction")
     private double accBalanceAfterTransaction;
 
+    @Column(name = "AccountToBeCredited")
+    private String accountToBeCredited;
+
+    @Column(name = "AccountToBeDebited")
+    private String accountToBeDebited;
+
+
+    public TransactionsEntity() {
+    }
+
+    public TransactionsEntity(int transactionTypeId, int accountId, double previousAccountBalance, double accBalanceAfterTransaction, String accountToBeCredited, String accountToBeDebited) {
+        this.transactionTypeId = transactionTypeId;
+        this.accountId = accountId;
+        this.previousAccountBalance = previousAccountBalance;
+        this.accBalanceAfterTransaction = accBalanceAfterTransaction;
+        this.accountToBeCredited = accountToBeCredited;
+        this.accountToBeDebited = accountToBeDebited;
+    }
+
     public int getAccountTransactionId() {
         return accountTransactionId;
     }
@@ -60,5 +79,21 @@ public class TransactionsEntity implements java.io.Serializable{
 
     public void setAccBalanceAfterTransaction(double accBalanceAfterTransaction) {
         this.accBalanceAfterTransaction = accBalanceAfterTransaction;
+    }
+
+    public String getAccountToBeCredited() {
+        return accountToBeCredited;
+    }
+
+    public void setAccountToBeCredited(String accountToBeCredited) {
+        this.accountToBeCredited = accountToBeCredited;
+    }
+
+    public String getAccountToBeDebited() {
+        return accountToBeDebited;
+    }
+
+    public void setAccountToBeDebited(String accountToBeDebited) {
+        this.accountToBeDebited = accountToBeDebited;
     }
 }
