@@ -37,17 +37,23 @@ public class AccountsController {
     @ApiResponses(value = {//
             @ApiResponse(code = 400, message = "Something went wrong"),
             @ApiResponse(code = 403, message = "Access denied"),
-            @ApiResponse(code = 404, message = "The user doesn't exist"),
+            @ApiResponse(code = 422, message = "Account number does not exist"),
             @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
-    public void retrieveAccountBalance(@ApiParam("accountNumber") @PathVariable String accountNumber) {
+    public ResponseEntity<AccountStatusResponseDto> retrieveAccountBalance(@ApiParam("accountNumber") @PathVariable String accountNumber) {
+        AccountStatusResponseDto accountStatusResponseDto = accountService.retrieveAccountBalance(accountNumber);
+        if (accountStatusResponseDto.getAccountStatus() == AccountStatus.DOES_NOT_EXIST) {
+            return new ResponseEntity<AccountStatusResponseDto>(accountStatusResponseDto, HttpStatus.valueOf(422));
+        }
 
+        return new ResponseEntity<AccountStatusResponseDto>(accountStatusResponseDto, HttpStatus.valueOf(200));
     }
 
 
     @PostMapping("/create")
     @ApiOperation(value = "${AccountsController.create}", response = AccountsEntity.class)
     @ApiResponses(value = {
-            @ApiResponse(code = 400, message = "Bad request"),
+            @ApiResponse(code = 400, message = "Something went wrong"),
+            @ApiResponse(code = 403, message = "Access denied"),
             @ApiResponse(code = 422, message = "Account number already exists")})
     public ResponseEntity<AccountsEntity> createAccount(HttpServletRequest httpServletRequest, @ApiParam("Account details") @RequestBody AccountCreationRequestDto accountCreationRequestDto) {
         String accessToken = jwtTokenProvider.resolveToken(httpServletRequest);
@@ -64,6 +70,7 @@ public class AccountsController {
     @PostMapping("/credit")
     @ApiOperation(value = "${AccountsController.credit}", response = AccountStatusResponseDto.class)
     @ApiResponses(value = {
+            @ApiResponse(code = 403, message = "Access denied"),
             @ApiResponse(code = 400, message = "Bad request"),
             @ApiResponse(code = 422, message = "Account number does not exist"),
             @ApiResponse(code = 425, message = "Ongoing transaction")
@@ -84,6 +91,7 @@ public class AccountsController {
     @PostMapping("/debit")
     @ApiOperation(value = "${AccountsController.debit}", response = AccountStatusResponseDto.class)
     @ApiResponses(value = {
+            @ApiResponse(code = 403, message = "Access denied"),
             @ApiResponse(code = 400, message = "Bad request"),
             @ApiResponse(code = 422, message = "Account number does not exist"),
             @ApiResponse(code = 423, message = "Insufficient funds")
@@ -109,6 +117,7 @@ public class AccountsController {
     @PostMapping("/transfer")
     @ApiOperation(value = "${AccountsController.transfer}", response = AccountStatusResponseDto.class)
     @ApiResponses(value = {
+            @ApiResponse(code = 403, message = "Access denied"),
             @ApiResponse(code = 400, message = "Bad request"),
             @ApiResponse(code = 420, message = "Account to be debited does not exist"),
             @ApiResponse(code = 421, message = "Account to be credited does not exist"),

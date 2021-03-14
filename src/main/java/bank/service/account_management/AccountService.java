@@ -169,4 +169,27 @@ public class AccountService {
 
         return TransferStatus.SUCCESSFUL_TRANSFER;
     }
+
+
+    public AccountStatusResponseDto retrieveAccountBalance(String accountNumber) {
+        AccountsEntity originatorAccount = accountsRepository.findByAccountNumber(accountNumber);
+
+        if (originatorAccount == null) {
+            return new AccountStatusResponseDto(
+                    0,
+                    null,
+                    0.0,
+                    false,
+                    AccountStatus.DOES_NOT_EXIST
+            );
+        }
+
+        return new AccountStatusResponseDto(
+                originatorAccount.getAccountId(),
+                originatorAccount.getAccountName(),
+                originatorAccount.getAccountBalance(),
+                false,
+                AccountStatus.ACCOUNT_BALANCE_REQUEST
+        );
+    }
 }
