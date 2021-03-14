@@ -6,6 +6,7 @@ import bank.dto.account_management.AccountCreditOrDebitRequestDto;
 import bank.dto.account_management.TransferRequestDto;
 import bank.entity.account_management.AccountStatus;
 import bank.entity.account_management.AccountsEntity;
+import bank.entity.account_management.TransferStatus;
 import bank.entity.user_management.User;
 import bank.repository.user_management.UserRepository;
 import bank.security.JwtTokenProvider;
@@ -110,9 +111,26 @@ public class AccountsController {
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Bad request"),
             @ApiResponse(code = 420, message = "Account to be debited does not exist"),
-            @ApiResponse(code = 421, message = "Account to be credited does not exist")
+            @ApiResponse(code = 421, message = "Account to be credited does not exist"),
+            @ApiResponse(code = 423, message = "Insufficient funds")
     })
-    public void transfer(@ApiParam("Transfer details") @RequestBody TransferRequestDto transferRequestDto) {
+    public ResponseEntity<TransferStatus> transfer(@ApiParam("Transfer details") @RequestBody TransferRequestDto transferRequestDto) {
+        TransferStatus transferStatus = accountService.transferFunds(transferRequestDto.getFromAccount(),
+                transferRequestDto.getToAccount(),
+                transferRequestDto.getAmount());
 
+        if (transferStatus == TransferStatus.ORIGINATOR_ACCOUNT_NON_EXISTENT) {
+            return new ResponseEntity<TransferStatus>(transferStatus, HttpStatus.valueOf(420));
+        }
+
+        if (transferStatus == TransferStatus.RECEPIENT_ACCOUNT_NON_EXISTENT) {
+            return new ResponseEntity<TransferStatus>(transferStatus, HttpStatus.valueOf(421));
+        }
+
+        if (transferStatus == TransferStatus.INSUFICIENT_ORIGINATOR_ACCOUNT_FUNDS) {
+            return new ResponseEntity<TransferStatus>(transferStatus, HttpStatus.valueOf(423));
+        }
+
+        return new ResponseEntity<TransferStatus>(transferStatus, HttpStatus.valueOf(200));
     }
 }

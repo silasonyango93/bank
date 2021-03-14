@@ -4,12 +4,16 @@ import bank.dto.account_management.AccountStatusResponseDto;
 import bank.dto.account_management.AccountCreationRequestDto;
 import bank.entity.account_management.AccountStatus;
 import bank.entity.account_management.AccountsEntity;
+import bank.entity.account_management.TransferStatus;
 import bank.entity.transaction_management.TransactionsEntity;
 import bank.repository.account_management.AccountsRepository;
 import bank.repository.transaction_management.TransactionTypesRepository;
 import bank.repository.transaction_management.TransactionsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class AccountService {
@@ -137,5 +141,32 @@ public class AccountService {
                 false,
                 AccountStatus.SUCCESSFUL_TRANSACTION
         );
+    }
+
+    public TransferStatus transferFunds(String originatorAccountNumber, String recepientAccountNumber, double amount) {
+        AccountsEntity originatorAccount = accountsRepository.findByAccountNumber(originatorAccountNumber);
+
+        if (originatorAccount == null) {
+            return TransferStatus.ORIGINATOR_ACCOUNT_NON_EXISTENT;
+        }
+
+        if (originatorAccount.getAccountBalance() < amount) {
+            return TransferStatus.INSUFICIENT_ORIGINATOR_ACCOUNT_FUNDS;
+        }
+
+        AccountsEntity recepientAccount = accountsRepository.findByAccountNumber(recepientAccountNumber);
+
+        if (recepientAccount == null) {
+            return TransferStatus.RECEPIENT_ACCOUNT_NON_EXISTENT;
+        }
+
+        originatorAccount.setAccountBalance(originatorAccount.getAccountBalance() - amount);
+        recepientAccount.setAccountBalance(recepientAccount.getAccountBalance() + amount);
+        List<AccountsEntity> accountsEntityList = new ArrayList<>();
+        accountsEntityList.add(originatorAccount);
+        accountsEntityList.add(recepientAccount);
+        accountsRepository.saveAll(accountsEntityList);
+
+        return TransferStatus.SUCCESSFUL_TRANSFER;
     }
 }
