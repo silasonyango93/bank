@@ -47,8 +47,8 @@ public class SwaggerConfig {
 
     private ApiInfo metadata() {
         return new ApiInfoBuilder()//
-                .title("Kenya Livelihood zones data collection tool")//
-                .description("This is the documentation for the endpoints of this spring application. For the secret-key, consult with the developers to be able to try out the endpoints from swagger")//
+                .title("Sample bank for an interview")//
+                .description("This is the documentation for the endpoints of this spring application. For the secret-key, consult with the developer to be able to try out the endpoints from swagger")//
                 .version("1.0.0")//
                 .license("MIT License").licenseUrl("http://opensource.org/licenses/MIT")//
                 .contact(new Contact(null, null, "silas.onyango93@gmail.com"))//
