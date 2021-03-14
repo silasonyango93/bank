@@ -4,25 +4,9 @@ import bank.dto.account_management.AccountBalanceResponseDto;
 import bank.dto.account_management.AccountCreationRequestDto;
 import bank.dto.account_management.AccountCreditRequestDto;
 import bank.dto.account_management.TransferRequestDto;
-import bank.dto.user_management.SignupStatusDto;
-import bank.dto.user_management.UserDataDTO;
-import bank.dto.user_management.UserResponseDTO;
 import bank.entity.account_management.AccountsEntity;
-import bank.entity.user_management.User;
-import bank.service.user_management.retrofit.RetrofitClientInstance;
-import bank.service.user_management.retrofit.user_management.UserRetrofitModel;
-import bank.service.user_management.retrofit.user_management.UserRetrofitService;
 import io.swagger.annotations.*;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import retrofit2.Call;
-import retrofit2.Response;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static bank.configuration.EndPoints.NODE_SERVICE_BASE_URL;
 
 @RestController
 @RequestMapping("/account")
