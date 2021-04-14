@@ -1,4 +1,4 @@
-# Kenya Livelihoodzones data collection tool
+# Sample bank for an interview
 
 ![](https://img.shields.io/badge/build-success-brightgreen.svg)
 
@@ -10,7 +10,7 @@
 ![](https://img.shields.io/badge/jwt-✓-blue.svg)
 ![](https://img.shields.io/badge/swagger_2-✓-blue.svg)
 
-You can find endpoint documentation for this repository [here](http://application.livelihoodzone.xyz/swagger-ui.html).
+You can find endpoint documentation for this repository [here](http://bank.livelihoodzone.xyz/swagger-ui.html).
 
 ***
 
