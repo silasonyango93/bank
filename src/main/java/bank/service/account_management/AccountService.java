@@ -78,6 +78,16 @@ public class AccountService {
 
         List<TransactionsEntity> transactionsEntityList = transactionsDao.findByTransactionDate(Util.getToday());
 
+        if (transactionsEntityList.size() >= 4) {
+            return new AccountStatusResponseDto(
+                    accountToBeCredited.getAccountId(),
+                    accountToBeCredited.getAccountName(),
+                    accountToBeCredited.getAccountBalance(),
+                    false,
+                    AccountStatus.EXCEEDS_DAILY_TRANSACTION_FREQUENCY_LIMIT
+            );
+        }
+
         for (TransactionsEntity currentTransaction : transactionsEntityList) {
             totalTransactionAmountToday = totalTransactionAmountToday + currentTransaction.getTransactionAmount();
         }

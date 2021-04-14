@@ -75,7 +75,8 @@ public class AccountsController {
             @ApiResponse(code = 422, message = "Account number does not exist"),
             @ApiResponse(code = 425, message = "Ongoing transaction"),
             @ApiResponse(code = 426, message = "Exceeds per transaction limit"),
-            @ApiResponse(code = 405, message = "Exceeds daily transaction limit")
+            @ApiResponse(code = 405, message = "Exceeds daily transaction limit"),
+            @ApiResponse(code = 406, message = "Exceeds daily transaction frequency limit")
     })
     public ResponseEntity<AccountStatusResponseDto> creditAccount(@ApiParam("Account details") @RequestBody AccountCreditOrDebitRequestDto accountCreditOrDebitRequestDto) {
         AccountStatusResponseDto accountStatusResponseDto = accountService.creditAnAccount(accountCreditOrDebitRequestDto.getAccountNumber(), accountCreditOrDebitRequestDto.getAmount());
@@ -93,6 +94,10 @@ public class AccountsController {
 
         if (accountStatusResponseDto.getAccountStatus() == AccountStatus.EXCEED_DAILY_DEPOSIT_LIMIT) {
             return new ResponseEntity<AccountStatusResponseDto>(accountStatusResponseDto, HttpStatus.valueOf(405));
+        }
+
+        if (accountStatusResponseDto.getAccountStatus() == AccountStatus.EXCEEDS_DAILY_TRANSACTION_FREQUENCY_LIMIT) {
+            return new ResponseEntity<AccountStatusResponseDto>(accountStatusResponseDto, HttpStatus.valueOf(406));
         }
 
         return new ResponseEntity<AccountStatusResponseDto>(accountStatusResponseDto, HttpStatus.valueOf(200));
