@@ -2,6 +2,8 @@ package bank.util;
 
 import org.junit.Test;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -18,6 +20,16 @@ public class UtilTest {
         Calendar calendar = Calendar.getInstance();
         dateToday = calendar.getTime();
         assertTrue(Util.isToday(dateToday));
+    }
 
+
+    @Test
+    public void getToday_works_as_expected() {
+
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDateTime now = LocalDateTime.now();
+        String todayDateString = dtf.format(now);
+
+        assertEquals(todayDateString, Util.getToday());
     }
 }
