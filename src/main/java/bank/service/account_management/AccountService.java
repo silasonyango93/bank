@@ -70,7 +70,7 @@ public class AccountService {
                     accountToBeCredited.getAccountName(),
                     accountToBeCredited.getAccountBalance(),
                     false,
-                    AccountStatus.EXCEEDS_TRANSACTION_DEPOSIT_LIMIT
+                    AccountStatus.EXCEEDS_PER_TRANSACTION_DEPOSIT_LIMIT
             );
         }
 
