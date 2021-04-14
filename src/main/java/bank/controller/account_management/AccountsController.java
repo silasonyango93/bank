@@ -67,8 +67,8 @@ public class AccountsController {
         return new ResponseEntity<AccountsEntity>(createdAccount, HttpStatus.valueOf(200));
     }
 
-    @PostMapping("/credit")
-    @ApiOperation(value = "${AccountsController.credit}", response = AccountStatusResponseDto.class)
+    @PostMapping("/deposit")
+    @ApiOperation(value = "${AccountsController.deposit}", response = AccountStatusResponseDto.class)
     @ApiResponses(value = {
             @ApiResponse(code = 403, message = "Access denied"),
             @ApiResponse(code = 400, message = "Bad request"),
@@ -103,8 +103,8 @@ public class AccountsController {
         return new ResponseEntity<AccountStatusResponseDto>(accountStatusResponseDto, HttpStatus.valueOf(200));
     }
 
-    @PostMapping("/debit")
-    @ApiOperation(value = "${AccountsController.debit}", response = AccountStatusResponseDto.class)
+    @PostMapping("/withdraw")
+    @ApiOperation(value = "${AccountsController.withdraw}", response = AccountStatusResponseDto.class)
     @ApiResponses(value = {
             @ApiResponse(code = 403, message = "Access denied"),
             @ApiResponse(code = 400, message = "Bad request"),
