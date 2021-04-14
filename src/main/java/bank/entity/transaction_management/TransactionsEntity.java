@@ -11,11 +11,11 @@ import javax.persistence.*;
 )
 
 @NamedNativeQueries({
-        @NamedNativeQuery(name="TransactionsEntity.findByTransactionDate",
-                query="SELECT * FROM account_transactions WHERE DATE_FORMAT(TransactionDate, '%Y-%m-%d') = ?",
-                resultSetMapping = "account_transactions" )
+        @NamedNativeQuery(name = "TransactionsEntity.findByTransactionDate",
+                query = "SELECT * FROM account_transactions WHERE DATE_FORMAT(TransactionDate, '%Y-%m-%d') = ?",
+                resultSetMapping = "account_transactions")
 })
-public class TransactionsEntity implements java.io.Serializable{
+public class TransactionsEntity implements java.io.Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "AccountTransactionId")
@@ -49,13 +49,14 @@ public class TransactionsEntity implements java.io.Serializable{
     public TransactionsEntity() {
     }
 
-    public TransactionsEntity(int transactionTypeId, int accountId, double previousAccountBalance, double accBalanceAfterTransaction, String accountToBeCredited, String accountToBeDebited, String transactionDate) {
+    public TransactionsEntity(int transactionTypeId, int accountId, double previousAccountBalance, double accBalanceAfterTransaction, String accountToBeCredited, String accountToBeDebited, double transactionAmount, String transactionDate) {
         this.transactionTypeId = transactionTypeId;
         this.accountId = accountId;
         this.previousAccountBalance = previousAccountBalance;
         this.accBalanceAfterTransaction = accBalanceAfterTransaction;
         this.accountToBeCredited = accountToBeCredited;
         this.accountToBeDebited = accountToBeDebited;
+        this.transactionAmount = transactionAmount;
         this.transactionDate = transactionDate;
     }
 

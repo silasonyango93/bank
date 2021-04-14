@@ -74,7 +74,23 @@ public class AccountService {
             );
         }
 
+        double totalTransactionAmountToday = 0.0;
+
         List<TransactionsEntity> transactionsEntityList = transactionsDao.findByTransactionDate(Util.getToday());
+
+        for (TransactionsEntity currentTransaction : transactionsEntityList) {
+            totalTransactionAmountToday = totalTransactionAmountToday + currentTransaction.getTransactionAmount();
+        }
+
+        if (totalTransactionAmountToday > 150000) {
+            return new AccountStatusResponseDto(
+                    accountToBeCredited.getAccountId(),
+                    accountToBeCredited.getAccountName(),
+                    accountToBeCredited.getAccountBalance(),
+                    false,
+                    AccountStatus.EXCEED_DAILY_DEPOSIT_LIMIT
+            );
+        }
 
         accountToBeCredited.setIsTransactionOnGoing(1);
         accountsRepository.save(accountToBeCredited);
@@ -89,6 +105,7 @@ public class AccountService {
                 updatedAccount.getAccountBalance(),
                 updatedAccount.getAccountNumber(),
                 null,
+                amount,
                 Util.getToday()
         ));
         return new AccountStatusResponseDto(
@@ -151,6 +168,7 @@ public class AccountService {
                 updatedAccount.getAccountBalance(),
                 null,
                 updatedAccount.getAccountNumber(),
+                amount,
                 Util.getToday()
         ));
         return new AccountStatusResponseDto(
