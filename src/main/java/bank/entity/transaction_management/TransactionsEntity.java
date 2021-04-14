@@ -4,6 +4,17 @@ import javax.persistence.*;
 
 @javax.persistence.Entity
 @Table(name = "account_transactions")
+
+@javax.persistence.SqlResultSetMapping(
+        name = "account_transactions", entities =
+@javax.persistence.EntityResult(entityClass = TransactionsEntity.class)
+)
+
+@NamedNativeQueries({
+        @NamedNativeQuery(name="TransactionsEntity.findByTransactionDate",
+                query="SELECT * FROM account_transactions WHERE WHERE DATE_FORMAT(TransactionDate, '%Y-%m-%d') = ?",
+                resultSetMapping = "account_transactions" )
+})
 public class TransactionsEntity implements java.io.Serializable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,6 +38,12 @@ public class TransactionsEntity implements java.io.Serializable{
 
     @Column(name = "AccountToBeDebited")
     private String accountToBeDebited;
+
+    @Column(name = "TransactionAmount")
+    private double transactionAmount;
+
+    @Column(name = "TransactionDate")
+    private String transactionDate;
 
 
     public TransactionsEntity() {
@@ -95,5 +112,21 @@ public class TransactionsEntity implements java.io.Serializable{
 
     public void setAccountToBeDebited(String accountToBeDebited) {
         this.accountToBeDebited = accountToBeDebited;
+    }
+
+    public double getTransactionAmount() {
+        return transactionAmount;
+    }
+
+    public void setTransactionAmount(double transactionAmount) {
+        this.transactionAmount = transactionAmount;
+    }
+
+    public String getTransactionDate() {
+        return transactionDate;
+    }
+
+    public void setTransactionDate(String transactionDate) {
+        this.transactionDate = transactionDate;
     }
 }

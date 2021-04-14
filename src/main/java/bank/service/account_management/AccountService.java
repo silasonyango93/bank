@@ -1,5 +1,6 @@
 package bank.service.account_management;
 
+import bank.dao.transaction_management.TransactionsDao;
 import bank.dto.account_management.AccountStatusResponseDto;
 import bank.dto.account_management.AccountCreationRequestDto;
 import bank.entity.account_management.AccountStatus;
@@ -9,6 +10,7 @@ import bank.entity.transaction_management.TransactionsEntity;
 import bank.repository.account_management.AccountsRepository;
 import bank.repository.transaction_management.TransactionTypesRepository;
 import bank.repository.transaction_management.TransactionsRepository;
+import bank.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +27,9 @@ public class AccountService {
 
     @Autowired
     TransactionTypesRepository transactionTypesRepository;
+
+    @Autowired
+    TransactionsDao transactionsDao;
 
     public AccountsEntity createAccount(int userId, AccountCreationRequestDto accountCreationRequestDto) {
         return accountsRepository.save(new AccountsEntity(
@@ -58,6 +63,18 @@ public class AccountService {
                     AccountStatus.ONGOING_TRANSACTION
             );
         }
+
+        if (amount > 40000.0) {
+            return new AccountStatusResponseDto(
+                    accountToBeCredited.getAccountId(),
+                    accountToBeCredited.getAccountName(),
+                    accountToBeCredited.getAccountBalance(),
+                    false,
+                    AccountStatus.EXCEEDS_TRANSACTION_DEPOSIT_LIMIT
+            );
+        }
+
+        List<TransactionsEntity> transactionsEntityList = transactionsDao.findByTransactionDate(Util.getToday());
 
         accountToBeCredited.setIsTransactionOnGoing(1);
         accountsRepository.save(accountToBeCredited);

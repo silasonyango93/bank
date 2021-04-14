@@ -2,24 +2,24 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   namespace: uat
-  name: lz-spring-application
+  name: bank-application
   labels:
-    name: lz-spring-application
-    app: lz-spring-application
+    name: bank-application
+    app: bank-application
 spec:
   selector:
     matchLabels:
-      app: lz-spring-application
+      app: bank-application
   template:
     metadata:
-      name: lz-spring-application
+      name: bank-application
       labels:
-        name: lz-spring-application
-        app: lz-spring-application
+        name: bank-application
+        app: bank-application
     spec:
       containers:
-        - name: lz-spring-application
+        - name: bank-application
           imagePullPolicy: Always
-          image: sevenskies/lz-spring-application:latest
+          image: silasonyango93/bank:latest
           ports:
             - containerPort: 8080
