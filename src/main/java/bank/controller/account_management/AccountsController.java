@@ -109,7 +109,10 @@ public class AccountsController {
             @ApiResponse(code = 403, message = "Access denied"),
             @ApiResponse(code = 400, message = "Bad request"),
             @ApiResponse(code = 422, message = "Account number does not exist"),
-            @ApiResponse(code = 423, message = "Insufficient funds")
+            @ApiResponse(code = 423, message = "Insufficient funds"),
+            @ApiResponse(code = 415, message = "Exceeds per transaction withdrawal limit"),
+            @ApiResponse(code = 416, message = "Exceeds daily maximum withdrawal limit"),
+            @ApiResponse(code = 417, message = "Exceeded daily withdrawal frequency limit")
     })
     public ResponseEntity<AccountStatusResponseDto> debitAccount(@ApiParam("Account details") @RequestBody AccountCreditOrDebitRequestDto accountCreditOrDebitRequestDto) {
         AccountStatusResponseDto accountStatusResponseDto = accountService.debitAnAccount(accountCreditOrDebitRequestDto.getAccountNumber(), accountCreditOrDebitRequestDto.getAmount());
@@ -124,6 +127,18 @@ public class AccountsController {
 
         if (accountStatusResponseDto.getAccountStatus() == AccountStatus.INSUFFICIENT_FUNDS) {
             return new ResponseEntity<AccountStatusResponseDto>(accountStatusResponseDto, HttpStatus.valueOf(423));
+        }
+
+        if (accountStatusResponseDto.getAccountStatus() == AccountStatus.EXCEEDS_PER_TRANSACTION_WITHDRAWAL_LIMIT) {
+            return new ResponseEntity<AccountStatusResponseDto>(accountStatusResponseDto, HttpStatus.valueOf(415));
+        }
+
+        if (accountStatusResponseDto.getAccountStatus() == AccountStatus.EXCEEDED_DAILY_MAX_WITHDRAWAL_LIMIT) {
+            return new ResponseEntity<AccountStatusResponseDto>(accountStatusResponseDto, HttpStatus.valueOf(416));
+        }
+
+        if (accountStatusResponseDto.getAccountStatus() == AccountStatus.EXCEEDS_DAILY_WITHDRAWAL_FREQUENCY_LIMIT) {
+            return new ResponseEntity<AccountStatusResponseDto>(accountStatusResponseDto, HttpStatus.valueOf(417));
         }
 
         return new ResponseEntity<AccountStatusResponseDto>(accountStatusResponseDto, HttpStatus.valueOf(200));

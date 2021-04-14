@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AccountService {
@@ -78,6 +79,11 @@ public class AccountService {
 
         List<TransactionsEntity> transactionsEntityList = transactionsDao.findByTransactionDate(Util.getToday());
 
+        transactionsEntityList = transactionsEntityList
+                .stream()
+                .filter(t -> t.getTransactionTypeId() == transactionTypesRepository.findByTransactionTypeCode(1).getTransactionTypeId())
+                .collect(Collectors.toList());
+
         if (transactionsEntityList.size() >= 4) {
             return new AccountStatusResponseDto(
                     accountToBeCredited.getAccountId(),
@@ -92,7 +98,7 @@ public class AccountService {
             totalTransactionAmountToday = totalTransactionAmountToday + currentTransaction.getTransactionAmount();
         }
 
-        if (totalTransactionAmountToday > 150000) {
+        if (totalTransactionAmountToday >= 150000 || (totalTransactionAmountToday + amount) >= 150000) {
             return new AccountStatusResponseDto(
                     accountToBeCredited.getAccountId(),
                     accountToBeCredited.getAccountName(),
@@ -128,8 +134,6 @@ public class AccountService {
     }
 
 
-
-
     public AccountStatusResponseDto debitAnAccount(String accountNumber, double amount) {
         AccountsEntity accountToBeDebited = accountsRepository.findByAccountNumber(accountNumber);
 
@@ -160,6 +164,51 @@ public class AccountService {
                     accountToBeDebited.getAccountBalance(),
                     false,
                     AccountStatus.INSUFFICIENT_FUNDS
+            );
+        }
+
+        if (amount > 20000) {
+            return new AccountStatusResponseDto(
+                    accountToBeDebited.getAccountId(),
+                    accountToBeDebited.getAccountName(),
+                    accountToBeDebited.getAccountBalance(),
+                    false,
+                    AccountStatus.EXCEEDS_PER_TRANSACTION_WITHDRAWAL_LIMIT
+            );
+        }
+
+
+        List<TransactionsEntity> transactionsEntityList = transactionsDao.findByTransactionDate(Util.getToday());
+
+        transactionsEntityList = transactionsEntityList
+                .stream()
+                .filter(t -> t.getTransactionTypeId() == transactionTypesRepository.findByTransactionTypeCode(2).getTransactionTypeId())
+                .collect(Collectors.toList());
+
+        double totalWithdrawnAmountToday = 0.0;
+
+        for (TransactionsEntity currentTransaction : transactionsEntityList) {
+            totalWithdrawnAmountToday = totalWithdrawnAmountToday + currentTransaction.getTransactionAmount();
+        }
+
+        if (totalWithdrawnAmountToday >= 50000 || (totalWithdrawnAmountToday + amount) >= 50000) {
+            return new AccountStatusResponseDto(
+                    accountToBeDebited.getAccountId(),
+                    accountToBeDebited.getAccountName(),
+                    accountToBeDebited.getAccountBalance(),
+                    false,
+                    AccountStatus.EXCEEDED_DAILY_MAX_WITHDRAWAL_LIMIT
+            );
+        }
+
+
+        if (transactionsEntityList.size() >= 3) {
+            return new AccountStatusResponseDto(
+                    accountToBeDebited.getAccountId(),
+                    accountToBeDebited.getAccountName(),
+                    accountToBeDebited.getAccountBalance(),
+                    false,
+                    AccountStatus.EXCEEDS_DAILY_WITHDRAWAL_FREQUENCY_LIMIT
             );
         }
 
