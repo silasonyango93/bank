@@ -88,7 +88,8 @@ public class AccountService {
                 accountToBeCredited.getAccountBalance(),
                 updatedAccount.getAccountBalance(),
                 updatedAccount.getAccountNumber(),
-                null
+                null,
+                Util.getToday()
         ));
         return new AccountStatusResponseDto(
                 updatedAccount.getAccountId(),
@@ -149,7 +150,8 @@ public class AccountService {
                 accountToBeDebited.getAccountBalance(),
                 updatedAccount.getAccountBalance(),
                 null,
-                updatedAccount.getAccountNumber()
+                updatedAccount.getAccountNumber(),
+                Util.getToday()
         ));
         return new AccountStatusResponseDto(
                 updatedAccount.getAccountId(),
