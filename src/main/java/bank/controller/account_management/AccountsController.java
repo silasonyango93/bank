@@ -73,7 +73,9 @@ public class AccountsController {
             @ApiResponse(code = 403, message = "Access denied"),
             @ApiResponse(code = 400, message = "Bad request"),
             @ApiResponse(code = 422, message = "Account number does not exist"),
-            @ApiResponse(code = 425, message = "Ongoing transaction")
+            @ApiResponse(code = 425, message = "Ongoing transaction"),
+            @ApiResponse(code = 426, message = "Exceeds per transaction limit"),
+            @ApiResponse(code = 427, message = "Exceeds daily transaction limit")
     })
     public ResponseEntity<AccountStatusResponseDto> creditAccount(@ApiParam("Account details") @RequestBody AccountCreditOrDebitRequestDto accountCreditOrDebitRequestDto) {
         AccountStatusResponseDto accountStatusResponseDto = accountService.creditAnAccount(accountCreditOrDebitRequestDto.getAccountNumber(), accountCreditOrDebitRequestDto.getAmount());
@@ -83,6 +85,10 @@ public class AccountsController {
 
         if (accountStatusResponseDto.getAccountStatus() == AccountStatus.DOES_NOT_EXIST) {
             return new ResponseEntity<AccountStatusResponseDto>(accountStatusResponseDto, HttpStatus.valueOf(422));
+        }
+
+        if (accountStatusResponseDto.getAccountStatus() == AccountStatus.EXCEEDS_PER_TRANSACTION_DEPOSIT_LIMIT) {
+            return new ResponseEntity<AccountStatusResponseDto>(accountStatusResponseDto, HttpStatus.valueOf(426));
         }
 
         return new ResponseEntity<AccountStatusResponseDto>(accountStatusResponseDto, HttpStatus.valueOf(200));
